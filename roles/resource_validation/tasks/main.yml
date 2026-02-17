@@ -3,6 +3,10 @@
 
 - name: "Gather cluster info from given cluster {{ parent_vcenter_cluster }}"
   vmware.vmware.cluster_info:
+    hostname: "{{ parent_vcenter_hostname }}"
+    username: "{{ parent_vcenter_username }}"
+    password: "{{ parent_vcenter_password }}"
+    validate_certs: "{{ parent_vcenter_validate_certs }}"
     cluster_name: "{{ parent_vcenter_cluster }}"
   register: cluster_info
   delegate_to: localhost

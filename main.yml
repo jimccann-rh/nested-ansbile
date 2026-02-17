@@ -67,6 +67,10 @@
 
     - name: "Gather cluster info from given cluster {{ vc_cluster }}"
       vmware.vmware.cluster_info:
+        hostname: "{{ vc_hostname }}"
+        username: "{{ vc_username }}"
+        password: "{{ vc_password }}"
+        validate_certs: false
         cluster_name: "{{ vc_cluster }}"
       register: cluster_info
 

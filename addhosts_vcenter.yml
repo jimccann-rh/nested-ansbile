@@ -23,14 +23,22 @@
 - block:
     - name: Create Datacenter
       vmware.vmware.datacenter:
+        hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+        username: 'administrator@{{ vc_fact_domain }}'
+        password: "{{ vc_fact_password }}"
+        validate_certs: false
         datacenter_name: '{{ item }}'
         state: present
       loop:
         - '{{ vc_fact_datacenter1 }}'
 #        - '{{ vc_fact_datacenter2 }}'
-    
+
     - name: Create Cluster
       vmware.vmware.cluster:
+        hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+        username: 'administrator@{{ vc_fact_domain }}'
+        password: "{{ vc_fact_password }}"
+        validate_certs: false
         datacenter_name: '{{ item.datacenter }}'
         cluster_name: '{{ item.cluster }}'
       loop:
@@ -39,6 +47,10 @@
 
     - name: Enable DRS and set default VM behavior to fully automated
       vmware.vmware.cluster_drs:
+        hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+        username: 'administrator@{{ vc_fact_domain }}'
+        password: "{{ vc_fact_password }}"
+        validate_certs: false
         datacenter: '{{ vc_fact_datacenter1 }}'
         cluster_name: '{{ vc_fact_cluster1 }}'
         enable: True
@@ -50,19 +62,16 @@
 
     - name: Enable HA without admission control
       vmware.vmware.cluster_ha:
+        hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+        username: 'administrator@{{ vc_fact_domain }}'
+        password: "{{ vc_fact_password }}"
+        validate_certs: false
         datacenter: '{{ vc_fact_datacenter1 }}'
         cluster_name: '{{ vc_fact_cluster1 }}'
         enable: true
         advanced_settings: "{{ advs }}"
 
   run_once: true
-  module_defaults:
-    group/vmware:
-      hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
-      username: 'administrator@{{ vc_fact_domain }}'
-      #password: "{{ lookup('ansible.builtin.env', 'VCESXIPASSWORD') }}"
-      password: "{{ vc_fact_password }}"
-      validate_certs: false
 
 
 #- name: ESXi tweaks 
@@ -219,13 +228,13 @@
     - name: Set Allowed vCLS Datastores
       vmware.vmware.cluster_vcls:
         hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
-        password: "{{ vc_fact_password }}"
         username: 'administrator@{{ vc_fact_domain }}'
+        password: "{{ vc_fact_password }}"
         validate_certs: false
         datacenter: '{{ vc_fact_datacenter1 }}'
         cluster_name: '{{ vc_fact_cluster1 }}'
         allowed_datastores: "Datastore-{{ hostvars[groups['esxi'][my_idx]].NESTEDVMIP }}"
-   #    allowed_datastores: 
+   #    allowed_datastores:
    #      - "Datastore-10.93.60.221"
    ##      - "{{ vmfs_dn }}"
   ignore_errors: true

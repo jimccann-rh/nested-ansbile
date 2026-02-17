@@ -40,12 +40,14 @@ env/
 *.swo
 *~
 .DS_Store
+.claude/
 
 # Logs and temporary files
 /tmp/
 *.tmp
 *.bak
 *.orig
+c.txt
 
 # Ansible vault
 *.vault
