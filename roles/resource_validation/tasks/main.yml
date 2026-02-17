@@ -2,7 +2,7 @@
 # tasks file for resource_validation
 
 - name: "Gather cluster info from given cluster {{ parent_vcenter_cluster }}"
-  community.vmware.vmware_cluster_info:
+  vmware.vmware.cluster_info:
     cluster_name: "{{ parent_vcenter_cluster }}"
   register: cluster_info
   delegate_to: localhost

@@ -42,13 +42,16 @@ esxcli system settings advanced set -o /VSAN/FakeSCSIReservations -i 1
 - Ansible 2.9 or higher
 - Python 3.6 or higher
 - Ansible Collections:
-  - `community.vmware`
+  - `vmware.vmware` (required for cluster/datacenter modules)
+  - `community.vmware` (required for guest/host operations)
   - `community.general`
 
 Install collections:
 ```bash
-ansible-galaxy collection install community.vmware community.general
+ansible-galaxy collection install vmware.vmware community.vmware community.general
 ```
+
+**Note:** As of `community.vmware` v6.0.0, cluster and datacenter modules have been moved to the `vmware.vmware` collection.
 
 ## 🚀 Quick Start
 

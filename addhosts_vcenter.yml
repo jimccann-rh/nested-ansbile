@@ -22,7 +22,7 @@
 #- name: vCenter tweaks
 - block:
     - name: Create Datacenter
-      community.vmware.vmware_datacenter:
+      vmware.vmware.datacenter:
         datacenter_name: '{{ item }}'
         state: present
       loop:
@@ -30,7 +30,7 @@
 #        - '{{ vc_fact_datacenter2 }}'
     
     - name: Create Cluster
-      community.vmware.vmware_cluster:
+      vmware.vmware.cluster:
         datacenter_name: '{{ item.datacenter }}'
         cluster_name: '{{ item.cluster }}'
       loop:
@@ -38,7 +38,7 @@
 #        - { 'cluster': '{{ vc_fact_cluster2 }}', 'datacenter': '{{ vc_fact_datacenter2  }}' }
 
     - name: Enable DRS and set default VM behavior to fully automated
-      community.vmware.vmware_cluster_drs:
+      vmware.vmware.cluster_drs:
         datacenter: '{{ vc_fact_datacenter1 }}'
         cluster_name: '{{ vc_fact_cluster1 }}'
         enable: True
@@ -49,7 +49,7 @@
         advs: { "das.ignoreInsufficientHbDatastore": "True", "das.ignoreRedundantNetWarning": "True" }
 
     - name: Enable HA without admission control
-      community.vmware.vmware_cluster_ha:
+      vmware.vmware.cluster_ha:
         datacenter: '{{ vc_fact_datacenter1 }}'
         cluster_name: '{{ vc_fact_cluster1 }}'
         enable: true
@@ -164,7 +164,7 @@
         state: present
 
 #    - name: Set Allowed vCLS Datastores
-#      community.vmware.vmware_cluster_vcls:
+#      vmware.vmware.cluster_vcls:
 #        datacenter: '{{ vc_fact_datacenter1 }}'
 #        cluster_name: '{{ vc_fact_cluster1 }}'
 #        allowed_datastores: "Datastore-{{ hostvars[groups['esxi'][my_idx]].NESTEDVMIP }}"
@@ -217,7 +217,7 @@
 
 - block:
     - name: Set Allowed vCLS Datastores
-      community.vmware.vmware_cluster_vcls:
+      vmware.vmware.cluster_vcls:
         hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
         password: "{{ vc_fact_password }}"
         username: 'administrator@{{ vc_fact_domain }}'

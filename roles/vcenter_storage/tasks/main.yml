@@ -65,7 +65,7 @@
   when: vcenter_storage_nfs_enabled | bool
 
 - name: Set allowed vCLS datastores
-  community.vmware.vmware_cluster_vcls:
+  vmware.vmware.cluster_vcls:
     hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
     username: 'administrator@{{ nested_domain }}'
     password: "{{ nested_password }}"

@@ -80,8 +80,9 @@ nested_vcenter_hosts: []
 # ==============================================================================
 
 ansible_collections:
+  - vmware.vmware       # Required for cluster/datacenter modules (v6.0.0+)
+  - community.vmware    # Required for guest/host operations
   - community.general
-  - community.vmware
 
 # ==============================================================================
 # Module Defaults for Parent vCenter Operations

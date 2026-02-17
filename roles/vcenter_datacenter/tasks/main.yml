@@ -2,7 +2,7 @@
 # tasks file for vcenter_datacenter
 
 - name: Create Datacenter
-  community.vmware.vmware_datacenter:
+  vmware.vmware.datacenter:
     hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
     username: 'administrator@{{ nested_domain }}'
     password: "{{ nested_password }}"
@@ -11,7 +11,7 @@
     state: present
 
 - name: Create Cluster
-  community.vmware.vmware_cluster:
+  vmware.vmware.cluster:
     hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
     username: 'administrator@{{ nested_domain }}'
     password: "{{ nested_password }}"
@@ -20,7 +20,7 @@
     cluster_name: '{{ vcenter_cluster_name }}'
 
 - name: Enable DRS
-  community.vmware.vmware_cluster_drs:
+  vmware.vmware.cluster_drs:
     hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
     username: 'administrator@{{ nested_domain }}'
     password: "{{ nested_password }}"
@@ -32,7 +32,7 @@
   when: vcenter_drs_enabled | bool
 
 - name: Enable HA
-  community.vmware.vmware_cluster_ha:
+  vmware.vmware.cluster_ha:
     hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
     username: 'administrator@{{ nested_domain }}'
     password: "{{ nested_password }}"
