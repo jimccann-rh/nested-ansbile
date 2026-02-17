@@ -39,16 +39,21 @@ esxcli system settings advanced set -o /VSAN/FakeSCSIReservations -i 1
 
 ### Ansible Requirements
 
-- Ansible 2.9 or higher
+- Ansible 2.9 or higher (Ansible 2.18+ recommended for latest features)
 - Python 3.6 or higher
 - Ansible Collections:
-  - `vmware.vmware` (v1.11.0+) - Required for cluster modules (cluster, cluster_drs, cluster_ha, cluster_vcls, cluster_info)
-  - `community.vmware` (v5.0.0+) - Required for guest/host operations and datacenter management
-  - `community.general` (v5.0.0+) - Required for general utilities
+  - `vmware.vmware` (v2.7.0+) - Required for cluster modules (cluster, cluster_drs, cluster_ha, cluster_vcls, cluster_info)
+  - `community.vmware` (v6.0.0+) - Required for guest/host operations and datacenter management
+  - `community.general` (v11.0.0+) - Required for general utilities
 
 Install collections using the requirements file:
 ```bash
 ansible-galaxy collection install -r requirements.yml
+```
+
+To upgrade existing collections:
+```bash
+ansible-galaxy collection install -r requirements.yml --upgrade
 ```
 
 Or install individually:
@@ -56,7 +61,9 @@ Or install individually:
 ansible-galaxy collection install vmware.vmware community.vmware community.general
 ```
 
-**Note:** As of `community.vmware` v6.0.0, cluster modules have been moved to the `vmware.vmware` collection. The datacenter module remains in `community.vmware`.
+**Important Notes:**
+- As of `community.vmware` v6.0.0, cluster modules have been moved to the `vmware.vmware` collection. The datacenter module remains in `community.vmware`.
+- For Ansible 2.18+, use collection versions specified in requirements.yml to ensure compatibility and avoid version warnings.
 
 ## 🚀 Quick Start
 
