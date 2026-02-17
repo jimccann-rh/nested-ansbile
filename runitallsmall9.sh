@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Example script for deploying a small nested vSphere 9 environment
-# Single ESXi host + vCenter with reduced resources
+# Two ESXi hosts + vCenter with reduced resources
 #
 
 set -e
@@ -12,7 +12,7 @@ echo "========================================="
 
 # Configuration
 VERSION="9"
-ESXI_HOSTS='["nested9-singlemyjobname-host.vpshere.local"]'
+ESXI_HOSTS='["nested9-singlemyjobname1-host.vpshere.local","nested9-singlemyjobname2-host.vpshere.local"]'
 VC_HOSTS='["nested9-singlemyjobname-VC.vpshere.local"]'
 ESXI_MEMORY="65536"  # 64 GB
 ESXI_CPU="16"
