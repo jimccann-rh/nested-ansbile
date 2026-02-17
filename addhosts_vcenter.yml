@@ -22,7 +22,7 @@
 #- name: vCenter tweaks
 - block:
     - name: Create Datacenter
-      vmware.vmware.datacenter:
+      community.vmware.vmware_datacenter:
         hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
         username: 'administrator@{{ vc_fact_domain }}'
         password: "{{ vc_fact_password }}"
