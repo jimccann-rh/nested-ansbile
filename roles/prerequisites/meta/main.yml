@@ -1,0 +1,25 @@
+---
+galaxy_info:
+  author: Jim McCann
+  description: Install system packages and Python dependencies required for nested vSphere automation
+  company: Red Hat
+
+  license: Apache-2.0
+
+  min_ansible_version: "2.9"
+
+  platforms:
+    - name: Fedora
+      versions:
+        - all
+    - name: EL
+      versions:
+        - all
+
+  galaxy_tags:
+    - vmware
+    - vsphere
+    - prerequisites
+    - dependencies
+
+dependencies: []

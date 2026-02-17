@@ -1,0 +1,77 @@
+---
+# tasks file for vcenter_storage
+
+- name: Set ESXi hostname fact
+  ansible.builtin.set_fact:
+    esxi_host_ip: "{{ hostvars[loop_bms].NESTEDVMIP }}"
+
+- name: Rescan HBA for storage devices
+  community.vmware.vmware_host_scanhba:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    cluster_name: "{{ vcenter_cluster_name }}"
+    refresh_storage: true
+  when: vcenter_storage_rescan_hba | bool
+
+- name: Gather disk info from ESXi host
+  community.vmware.vmware_host_disk_info:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    esxi_hostname: "{{ esxi_host_ip }}"
+  register: host_vmhbas
+
+- name: Set vmhba info fact
+  ansible.builtin.set_fact:
+    vmhbainfo: "{{ host_vmhbas['hosts_disk_info'][esxi_host_ip] }}"
+
+- name: Find disk by device CTD
+  ansible.builtin.set_fact:
+    vmfs_dn: "{{ item.canonical_name }}"
+  loop: "{{ vmhbainfo }}"
+  when: item.device_ctd_list[0] == vcenter_storage_vmfs_device_ctd
+
+- name: Create VMFS datastore
+  community.vmware.vmware_host_datastore:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    esxi_hostname: "{{ esxi_host_ip }}"
+    datastore_name: "{{ vcenter_storage_vmfs_datastore_prefix }}-{{ esxi_host_ip }}"
+    vmfs_device_name: "{{ vmfs_dn }}"
+    vmfs_version: "{{ vcenter_storage_vmfs_version }}"
+    datastore_type: vmfs
+    state: present
+  when: vmfs_dn is defined
+
+- name: Mount NFS datastores to ESXi
+  community.vmware.vmware_host_datastore:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    esxi_hostname: "{{ esxi_host_ip }}"
+    datastore_name: '{{ item.name }}'
+    datastore_type: '{{ item.type }}'
+    nfs_server: '{{ item.server }}'
+    nfs_path: '{{ item.path }}'
+    nfs_ro: '{{ item.nfs_ro }}'
+    state: present
+  loop: "{{ vcenter_storage_nfs_mounts }}"
+  when: vcenter_storage_nfs_enabled | bool
+
+- name: Set allowed vCLS datastores
+  community.vmware.vmware_cluster_vcls:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    datacenter: "{{ vcenter_datacenter_name }}"
+    cluster_name: "{{ vcenter_cluster_name }}"
+    allowed_datastores: "{{ vcenter_storage_vmfs_datastore_prefix }}-{{ esxi_host_ip }}"
+  when: vcenter_storage_vcls_configure | bool and vmfs_dn is defined
+  ignore_errors: true

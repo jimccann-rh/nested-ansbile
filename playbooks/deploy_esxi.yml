@@ -1,0 +1,37 @@
+---
+# Playbook to deploy only nested ESXi hosts
+
+- name: Prepare dynamic inventory
+  hosts: remotedevqe
+  gather_facts: false
+  tasks:
+    - name: Add ESXi hosts to esxi group
+      ansible.builtin.add_host:
+        name: '{{ item }}'
+        groups: esxi
+      loop: "{{ nested_esxi_hosts }}"
+      when: nested_esxi_hosts is defined and nested_esxi_hosts | length > 0
+
+  tags: always
+
+- name: Validate environment
+  hosts: remotedevqe
+  gather_facts: true
+  roles:
+    - role: resource_validation
+      tags: ['validate']
+
+- name: Deploy nested ESXi hosts
+  hosts: remotedevqe
+  gather_facts: false
+  tasks:
+    - name: Deploy ESXi VMs
+      ansible.builtin.include_role:
+        name: nested_esxi
+      loop: "{{ groups['esxi'] }}"
+      loop_control:
+        loop_var: loop_bms
+        index_var: my_idx
+      when: groups['esxi'] is defined and groups['esxi'] | length > 0
+
+  tags: ['esxi', 'deploy']

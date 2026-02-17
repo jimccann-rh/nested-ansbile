@@ -1,0 +1,128 @@
+---
+# Main deployment playbook for nested vSphere environment
+
+- name: Prepare dynamic inventory
+  hosts: remotedevqe
+  gather_facts: false
+  tasks:
+    - name: Add ESXi hosts to esxi group
+      ansible.builtin.add_host:
+        name: '{{ item }}'
+        groups: esxi
+      loop: "{{ nested_esxi_hosts }}"
+      when: nested_esxi_hosts is defined and nested_esxi_hosts | length > 0
+
+    - name: Add vCenter hosts to vc group
+      ansible.builtin.add_host:
+        name: '{{ item }}'
+        groups: vc
+      loop: "{{ nested_vcenter_hosts }}"
+      when: nested_vcenter_hosts is defined and nested_vcenter_hosts | length > 0
+
+  tags: always
+
+- name: Validate and prepare environment
+  hosts: remotedevqe
+  gather_facts: true
+  roles:
+    - role: prerequisites
+      tags: ['prerequisites', 'never']
+
+    - role: resource_validation
+      tags: ['validate', 'deploy']
+
+  tags: ['deploy']
+
+- name: Deploy nested ESXi hosts
+  hosts: remotedevqe
+  gather_facts: false
+  tasks:
+    - name: Deploy ESXi VMs
+      ansible.builtin.include_role:
+        name: nested_esxi
+      loop: "{{ groups['esxi'] }}"
+      loop_control:
+        loop_var: loop_bms
+        index_var: my_idx
+      when: groups['esxi'] is defined and groups['esxi'] | length > 0
+
+  tags: ['esxi', 'deploy']
+
+- name: Deploy nested vCenter
+  hosts: remotedevqe
+  gather_facts: false
+  tasks:
+    - name: Deploy vCenter VMs
+      ansible.builtin.include_role:
+        name: nested_vcenter
+      loop: "{{ groups['vc'] }}"
+      loop_control:
+        loop_var: loop_bms_vc
+        index_var: my_idx_vc
+      when: groups['vc'] is defined and groups['vc'] | length > 0
+
+  tags: ['vcenter', 'deploy']
+
+- name: Configure nested vCenter infrastructure
+  hosts: remotedevqe
+  gather_facts: false
+  serial: 1
+  tasks:
+    - name: Create datacenter and cluster
+      ansible.builtin.include_role:
+        name: vcenter_datacenter
+      run_once: true
+      when: groups['vc'] is defined and groups['vc'] | length > 0
+
+    - name: Configure ESXi hosts in vCenter
+      ansible.builtin.include_role:
+        name: vcenter_host_config
+      loop: "{{ groups['esxi'] }}"
+      loop_control:
+        loop_var: loop_bms
+        index_var: my_idx
+      when: groups['esxi'] is defined and groups['esxi'] | length > 0
+
+    - name: Configure storage
+      ansible.builtin.include_role:
+        name: vcenter_storage
+      vars:
+        vcenter_storage_nfs_enabled: "{{ nfsetup | default(false) }}"
+      loop: "{{ groups['esxi'] }}"
+      loop_control:
+        loop_var: loop_bms
+        index_var: my_idx
+      when: groups['esxi'] is defined and groups['esxi'] | length > 0
+
+    - name: Configure networking
+      ansible.builtin.include_role:
+        name: vcenter_networking
+      loop: "{{ groups['esxi'] }}"
+      loop_control:
+        loop_var: loop_bms
+        index_var: my_idx
+      when: groups['esxi'] is defined and groups['esxi'] | length > 0
+
+  tags: ['configure', 'vcenter_config']
+
+- name: Display environment information
+  hosts: remotedevqe
+  gather_facts: false
+  tasks:
+    - name: Show vCenter access information
+      ansible.builtin.debug:
+        msg:
+          - "========================================="
+          - "vCenter IP: {{ hostvars[item]['NESTEDVMIP'] }}"
+          - "vCenter URL: https://{{ hostvars[item]['NESTEDVMIP'] }}"
+          - "vCenter DNS: {{ hostvars[item]['NESTEDVMIP'].split('.') | reverse | join('-') }}.in-addr.arpa"
+          - "Username: administrator@{{ nested_domain }}"
+          - "Password: Set via VCESXIPASSWORD environment variable"
+          - "========================================="
+      loop: "{{ groups['vc'] }}"
+      when:
+        - groups['vc'] is defined
+        - groups['vc'] | length > 0
+        - showinfo | default(true)
+
+  tags: ['info']

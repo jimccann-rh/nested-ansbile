@@ -1,0 +1,96 @@
+---
+# Global variables for nested vSphere automation
+
+# ==============================================================================
+# Parent vCenter Configuration
+# ==============================================================================
+# The physical vCenter where nested VMs will be deployed
+
+parent_vcenter_hostname: "{{ lookup('ansible.builtin.env', 'VMWARE_HOST') }}"
+parent_vcenter_username: "{{ lookup('ansible.builtin.env', 'VMWARE_USER') }}"
+parent_vcenter_password: "{{ lookup('ansible.builtin.env', 'VMWARE_PASSWORD') }}"
+parent_vcenter_datacenter: "devqedatacenter-1"
+parent_vcenter_cluster: "devqecluster-1"
+parent_vcenter_folder: "nested-limited"
+parent_vcenter_validate_certs: false
+
+# Legacy variable names (for backward compatibility)
+vc_hostname: "{{ parent_vcenter_hostname }}"
+vc_username: "{{ parent_vcenter_username }}"
+vc_password: "{{ parent_vcenter_password }}"
+vc_datacenter: "{{ parent_vcenter_datacenter }}"
+vc_cluster: "{{ parent_vcenter_cluster }}"
+vc_folder: "{{ parent_vcenter_folder }}"
+
+# ==============================================================================
+# Nested Environment Configuration
+# ==============================================================================
+# Configuration for the nested vSphere environment to be created
+
+# Version control (8 or 9)
+nested_environment_version: "8"
+version: "{{ nested_environment_version }}"  # Legacy compatibility
+
+# Authentication
+nested_password: "{{ lookup('ansible.builtin.env', 'VCESXIPASSWORD') }}"
+
+# Domain and networking
+nested_domain: "vsphere.local"
+nested_ntp_server: "10.0.77.54"
+nested_deployment_network: "devqe-922"
+
+# Legacy variable names (for backward compatibility)
+vc_fact_domain: "{{ nested_domain }}"
+vc_fact_ntp: "{{ nested_ntp_server }}"
+vc_fact_password: "{{ nested_password }}"
+vc_fact_deployment_network: "{{ nested_deployment_network }}"
+vc_fact_deployment_network2: "{{ nested_deployment_network }}"
+
+# Datacenter and cluster names for nested environment
+vc_fact_datacenter1: "nested-devqedatacenter-1"
+vc_fact_datacenter2: "nested-devqedatacenter-2"
+vc_fact_cluster1: "nested-devqecluster-1"
+vc_fact_cluster2: "nested-devqecluster-2"
+
+# ==============================================================================
+# OVA Distribution Configuration
+# ==============================================================================
+# HTTP server hosting OVA files
+
+ova_http_server: "10.185.92.22:8080"
+ova_base_url: "http://{{ ova_http_server }}"
+
+# Legacy compatibility
+httpova: "{{ ova_http_server }}"
+
+# ==============================================================================
+# Host Lists
+# ==============================================================================
+# Lists of hosts to deploy (can be overridden via extra vars)
+
+nested_esxi_hosts: []
+nested_vcenter_hosts: []
+
+# These will be populated dynamically via --extra-var in playbook runs:
+# Example: --extra-var nested_esxi_hosts='["nested8-host1.local","nested8-host2.local"]'
+# Example: --extra-var nested_vcenter_hosts='["nested8-vc.local"]'
+
+# ==============================================================================
+# Ansible Collections
+# ==============================================================================
+
+ansible_collections:
+  - community.general
+  - community.vmware
+
+# ==============================================================================
+# Module Defaults for Parent vCenter Operations
+# ==============================================================================
+# These defaults apply to all VMware modules when connecting to parent vCenter
+
+module_defaults:
+  group/vmware:
+    hostname: "{{ parent_vcenter_hostname }}"
+    username: "{{ parent_vcenter_username }}"
+    password: "{{ parent_vcenter_password }}"
+    validate_certs: "{{ parent_vcenter_validate_certs }}"

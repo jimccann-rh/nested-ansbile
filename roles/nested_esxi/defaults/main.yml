@@ -1,0 +1,12 @@
+---
+# defaults file for nested_esxi
+
+nested_esxi_version: "8"
+nested_esxi_memory_mb: 131072
+nested_esxi_cpu_count: 20
+nested_esxi_disk_size_tb: 1
+nested_esxi_disk_provisioning: "thin"
+nested_esxi_enable_nested_virt: true
+nested_esxi_testing_mode: false  # Delete existing VMs if true
+nested_esxi_wait_timeout: 900
+nested_esxi_datastore: "vsanDatastore"

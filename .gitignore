@@ -1,0 +1,88 @@
+# Ansible specific
+*.retry
+*.log
+.ansible/
+ansible.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs and temporary files
+/tmp/
+*.tmp
+*.bak
+*.orig
+
+# Ansible vault
+*.vault
+vault_pass.txt
+.vault_pass
+
+# Environment files
+.env
+*.source
+nested.source
+
+# Ansible Galaxy
+roles/*/tests/
+galaxy_install_info.txt
+
+# Inventory backups
+inventory/*.bak
+hosts.bak
+
+# Cache
+.cache/
+*.cache
+
+# Sensitive data
+*password*
+*secret*
+*key.pem
+*.key
+*.crt
+credentials.yml
+
+# Generated files
+*.qcow2
+*.vmdk
+*.iso
+
+# OS specific
+Thumbs.db
+.Spotlight-V100
+.Trashes

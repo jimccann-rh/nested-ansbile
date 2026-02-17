@@ -1,0 +1,20 @@
+---
+# Deploy new ESXi VM from OVA
+
+- name: "Deploy ESXi OVA for {{ host_fact_hostname }}"
+  community.vmware.vmware_deploy_ovf:
+    url: "{{ ova_base_url }}/{{ nested_esxi_ova_file }}"
+    power_on: false
+    datacenter: "{{ parent_vcenter_datacenter }}"
+    name: '{{ host_fact_hostname }}'
+    enable_hidden_properties: true
+    folder: "{{ parent_vcenter_datacenter }}/vm/{{ parent_vcenter_folder }}"
+    datastore: "{{ nested_esxi_datastore }}"
+    disk_provisioning: "{{ nested_esxi_disk_provisioning }}"
+    networks:
+      "VM Network": "{{ nested_deployment_network }}"
+    wait_for_ip_address: true
+    validate_certs: false
+    inject_ovf_env: true
+    properties:
+      guestinfo.password: "{{ nested_password }}"

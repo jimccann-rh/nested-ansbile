@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: Jim McCann
+  description: Remove nested vSphere VMs (ESXi and vCenter)
+  company: Red Hat
+  license: Apache-2.0
+  min_ansible_version: "2.9"
+  platforms:
+    - name: Fedora
+      versions:
+        - all
+    - name: EL
+      versions:
+        - all
+  galaxy_tags:
+    - vmware
+    - vsphere
+    - cleanup
+    - removal
+
+dependencies: []

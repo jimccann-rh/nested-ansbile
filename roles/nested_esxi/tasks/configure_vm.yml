@@ -1,0 +1,32 @@
+---
+# Configure ESXi VM hardware
+
+- name: "Add disk to virtual machine {{ host_fact_hostname }}"
+  community.vmware.vmware_guest_disk:
+    datacenter: "{{ parent_vcenter_datacenter }}"
+    name: "{{ host_fact_hostname }}"
+    disk:
+      - size_tb: "{{ nested_esxi_disk_size_tb }}"
+        type: "{{ nested_esxi_disk_provisioning }}"
+        datastore: "{{ nested_esxi_datastore }}"
+        state: present
+        scsi_controller: 0
+        unit_number: 2
+
+- name: "Modify CPU/memory for virtual machine {{ host_fact_hostname }}"
+  community.vmware.vmware_guest:
+    datacenter: "{{ parent_vcenter_datacenter }}"
+    folder: "{{ parent_vcenter_datacenter }}/vm/{{ parent_vcenter_folder }}"
+    name: "{{ host_fact_hostname }}"
+    state: present
+    hardware:
+      memory_mb: "{{ nested_esxi_memory_mb }}"
+      num_cpus: "{{ nested_esxi_cpu_count }}"
+      nested_virt: "{{ nested_esxi_enable_nested_virt }}"
+
+- name: "Ensure ESXi virtual machine {{ host_fact_hostname }} exists"
+  community.vmware.vmware_guest:
+    datacenter: "{{ parent_vcenter_datacenter }}"
+    folder: "{{ parent_vcenter_datacenter }}/vm/{{ parent_vcenter_folder }}"
+    name: "{{ host_fact_hostname }}"
+    state: present

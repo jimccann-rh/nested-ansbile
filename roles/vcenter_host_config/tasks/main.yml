@@ -1,0 +1,67 @@
+---
+# tasks file for vcenter_host_config
+
+- name: Set ESXi hostname fact
+  ansible.builtin.set_fact:
+    esxi_host_ip: "{{ hostvars[loop_bms].NESTEDVMIP }}"
+
+- name: "Add ESXi Host {{ esxi_host_ip }} to vCenter"
+  community.vmware.vmware_host:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    datacenter: "{{ vcenter_datacenter_name }}"
+    cluster: "{{ vcenter_cluster_name }}"
+    esxi_hostname: "{{ esxi_host_ip }}"
+    esxi_username: "root"
+    esxi_password: "{{ nested_password }}"
+    state: present
+
+- name: Set power management policy to {{ vcenter_host_power_policy }}
+  community.vmware.vmware_host_powermgmt_policy:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    esxi_hostname: "{{ esxi_host_ip }}"
+    policy: "{{ vcenter_host_power_policy }}"
+
+- name: Configure VM autostart defaults
+  community.vmware.vmware_host_auto_start:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    esxi_hostname: "{{ esxi_host_ip }}"
+    system_defaults:
+      enabled: "{{ vcenter_host_autostart_enabled }}"
+      start_delay: "{{ vcenter_host_autostart_delay }}"
+      stop_action: "{{ vcenter_host_autostart_stop_action }}"
+      wait_for_heartbeat: "{{ vcenter_host_autostart_wait_heartbeat }}"
+
+- name: Enable vMotion on {{ vcenter_host_vmotion_vmk }}
+  community.vmware.vmware_vmkernel:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    esxi_hostname: "{{ esxi_host_ip }}"
+    vswitch_name: "{{ vcenter_host_vmotion_vswitch }}"
+    portgroup_name: "{{ vcenter_host_vmotion_portgroup }}"
+    enable_vmotion: "{{ vcenter_host_enable_vmotion }}"
+    enable_mgmt: true
+    device: "{{ vcenter_host_vmotion_vmk }}"
+    network:
+      type: 'dhcp'
+
+- name: Exit maintenance mode
+  community.vmware.vmware_maintenancemode:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    esxi_hostname: "{{ esxi_host_ip }}"
+    timeout: 3600
+    state: absent
+  when: vcenter_host_exit_maintenance | bool

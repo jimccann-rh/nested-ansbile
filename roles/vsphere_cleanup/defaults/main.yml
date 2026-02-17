@@ -1,0 +1,5 @@
+---
+# defaults file for vsphere_cleanup
+
+vsphere_cleanup_force_remove: true
+vsphere_cleanup_enabled: false

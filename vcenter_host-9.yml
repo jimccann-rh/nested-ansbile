@@ -1,0 +1,4 @@
+esxiova: 'Nested_ESXi9.0_Appliance_Template_v1.0.ova'
+#esxiova: 'Nested_ESX9_Template.ova'
+vcenterova: 'VMware-vCenter-Server-Appliance-9.1.0.0.24840651_OVF10.ova'
+httpova: "10.185.92.22:8080"

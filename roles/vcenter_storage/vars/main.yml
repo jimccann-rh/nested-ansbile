@@ -1,0 +1,13 @@
+---
+# NFS mount configuration
+vcenter_storage_nfs_mounts:
+  - name: 'isos'
+    server: '10.185.92.22'
+    path: '/data/export/share/'
+    type: 'nfs41'
+    nfs_ro: true
+  - name: 'dsnested'
+    server: '10.185.151.99'
+    path: '/nfsmount/devqe'
+    type: 'nfs41'
+    nfs_ro: false

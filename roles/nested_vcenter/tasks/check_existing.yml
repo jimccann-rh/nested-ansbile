@@ -1,0 +1,48 @@
+---
+# Check if vCenter VM exists
+
+- name: "DELETE virtual machine {{ host_fact_hostname }} for testing"
+  community.vmware.vmware_guest:
+    datacenter: "{{ parent_vcenter_datacenter }}"
+    folder: "{{ parent_vcenter_datacenter }}/vm/{{ parent_vcenter_folder }}"
+    name: "{{ host_fact_hostname }}"
+    state: absent
+    force: true
+  when: nested_vcenter_testing_mode | bool
+
+- name: "Check if vCenter virtual machine {{ host_fact_hostname }} exists"
+  community.vmware.vmware_guest:
+    datacenter: "{{ parent_vcenter_datacenter }}"
+    folder: "{{ parent_vcenter_datacenter }}/vm/{{ parent_vcenter_folder }}"
+    name: "{{ host_fact_hostname }}"
+    state: present
+
+- name: "Get existing vCenter VM {{ host_fact_hostname }} IP address"
+  community.vmware.vmware_guest_info:
+    datacenter: "{{ parent_vcenter_datacenter }}"
+    name: "{{ host_fact_hostname }}"
+    schema: vsphere
+    properties:
+      - guest.ipAddress
+  register: nested_vm
+
+- name: Display vCenter IP address
+  ansible.builtin.debug:
+    msg: "vCenter IP: {{ nested_vm.instance.guest.ipAddress }}"
+
+- name: Wait for vCenter API to be available
+  community.vmware.vmware_about_info:
+    hostname: '{{ nested_vm.instance.guest.ipAddress }}'
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+  retries: 30
+  delay: 60
+  register: result
+  until: result is succeeded
+
+- name: Add existing vCenter to inventory with IP
+  ansible.builtin.add_host:
+    name: '{{ host_fact_hostname }}'
+    groups: vc
+    NESTEDVMIP: "{{ nested_vm.instance.guest.ipAddress }}"

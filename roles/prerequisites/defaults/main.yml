@@ -1,0 +1,15 @@
+---
+# defaults file for prerequisites
+
+prerequisites_system_packages:
+  - python3-pip
+  - git
+  - gcc
+
+prerequisites_python_packages:
+  - dnspython
+  - pyvmomi
+  - pyvim
+  - requests
+  - omsdk
+  - jmespath

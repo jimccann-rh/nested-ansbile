@@ -1,0 +1,37 @@
+---
+# tasks file for resource_validation
+
+- name: "Gather cluster info from given cluster {{ parent_vcenter_cluster }}"
+  community.vmware.vmware_cluster_info:
+    cluster_name: "{{ parent_vcenter_cluster }}"
+  register: cluster_info
+  delegate_to: localhost
+
+- name: Calculate available resource thresholds
+  ansible.builtin.set_fact:
+    cpuover: "{{ cluster_info['clusters'][parent_vcenter_cluster]['resource_summary']['cpuCapacityMHz'] - resource_validation_cpu_reserved }}"
+    memover: "{{ cluster_info['clusters'][parent_vcenter_cluster]['resource_summary']['memCapacityMB'] - resource_validation_memory_reserved }}"
+    dskover: "{{ cluster_info['clusters'][parent_vcenter_cluster]['resource_summary']['storageCapacityMB'] - resource_validation_storage_reserved }}"
+
+- name: Display resource summary
+  ansible.builtin.debug:
+    msg:
+      - "{{ cluster_info['clusters'][parent_vcenter_cluster]['resource_summary'] }}"
+      - "CPU threshold: {{ cpuover }}"
+      - "Memory threshold: {{ memover }}"
+      - "Storage threshold: {{ dskover }}"
+
+- name: Check resource usage CPU
+  ansible.builtin.fail:
+    msg: "CPU usage is too high in cluster REMOVE RESOURCES"
+  when: cluster_info['clusters'][parent_vcenter_cluster]['resource_summary']['cpuUsedMHz'] > (cpuover | int)
+
+- name: Check resource usage MEMORY
+  ansible.builtin.fail:
+    msg: "MEMORY usage is too high in cluster REMOVE RESOURCES"
+  when: cluster_info['clusters'][parent_vcenter_cluster]['resource_summary']['memUsedMB'] > (memover | int)
+
+- name: Check resource usage DISK
+  ansible.builtin.fail:
+    msg: "DISK usage is too high in cluster REMOVE RESOURCES"
+  when: cluster_info['clusters'][parent_vcenter_cluster]['resource_summary']['storageUsedMB'] > (dskover | int)

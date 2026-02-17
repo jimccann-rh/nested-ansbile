@@ -1,0 +1,28 @@
+---
+# tasks file for vsphere_cleanup
+
+- name: List ESXi hosts to be removed
+  ansible.builtin.debug:
+    msg: "ESXi Host: {{ item }}"
+  loop: "{{ groups['esxi'] | default([]) }}"
+
+- name: List vCenter hosts to be removed
+  ansible.builtin.debug:
+    msg: "vCenter Host: {{ item }}"
+  loop: "{{ groups['vc'] | default([]) }}"
+
+- name: Remove vSphere virtual machines
+  block:
+    - name: "Delete virtual machine {{ loop_bms }}"
+      community.vmware.vmware_guest:
+        hostname: "{{ parent_vcenter_hostname }}"
+        username: "{{ parent_vcenter_username }}"
+        password: "{{ parent_vcenter_password }}"
+        validate_certs: "{{ parent_vcenter_validate_certs }}"
+        datacenter: "{{ parent_vcenter_datacenter }}"
+        folder: "{{ parent_vcenter_datacenter }}/vm/{{ parent_vcenter_folder }}"
+        name: "{{ loop_bms }}"
+        state: absent
+        force: "{{ vsphere_cleanup_force_remove }}"
+
+  when: vsphere_cleanup_enabled | bool

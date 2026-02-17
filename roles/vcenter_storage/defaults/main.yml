@@ -1,0 +1,9 @@
+---
+# defaults file for vcenter_storage
+
+vcenter_storage_vmfs_version: 6
+vcenter_storage_vmfs_device_ctd: "vmhba1:C0:T2:L0"
+vcenter_storage_vmfs_datastore_prefix: "Datastore"
+vcenter_storage_nfs_enabled: false
+vcenter_storage_rescan_hba: true
+vcenter_storage_vcls_configure: true

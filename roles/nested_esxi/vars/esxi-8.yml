@@ -1,0 +1,4 @@
+---
+# ESXi 8.x specific variables
+nested_esxi_ova_file: 'Nested_ESXi8.0u2c_Appliance_Template_v1.ova'
+nested_esxi_guest_id: "vmkernel8Guest"

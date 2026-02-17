@@ -1,0 +1,29 @@
+---
+# tasks file for nested_esxi
+
+- name: Include version-specific variables
+  ansible.builtin.include_vars: "esxi-{{ nested_esxi_version }}.yml"
+
+- name: List hosts in ESXi group
+  ansible.builtin.debug:
+    msg: "ESXi Host: {{ item }}"
+  loop: "{{ groups['esxi'] }}"
+
+- name: Set ESXi hostname fact
+  ansible.builtin.set_fact:
+    host_fact_hostname: "{{ loop_bms }}"
+
+- name: Check for existing ESXi VM and deploy if needed
+  block:
+    - name: Check if ESXi VM exists
+      ansible.builtin.include_tasks: check_existing.yml
+
+  rescue:
+    - name: Deploy new ESXi VM
+      ansible.builtin.include_tasks: deploy_new.yml
+
+    - name: Configure ESXi VM hardware
+      ansible.builtin.include_tasks: configure_vm.yml
+
+- name: Power on and validate ESXi VM
+  ansible.builtin.include_tasks: power_on.yml

@@ -1,0 +1,4 @@
+---
+# vCenter 9.x specific variables
+nested_vcenter_ova_file: 'VMware-vCenter-Server-Appliance-9.1.0.0.24840651_OVF10.ova'
+nested_vcenter_guest_id: "vmkernel8Guest"

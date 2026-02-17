@@ -1,0 +1,13 @@
+---
+# defaults file for vcenter_host_config
+
+vcenter_host_power_policy: "high-performance"
+vcenter_host_autostart_enabled: true
+vcenter_host_autostart_delay: 100
+vcenter_host_autostart_stop_action: "guestShutdown"
+vcenter_host_autostart_wait_heartbeat: true
+vcenter_host_enable_vmotion: true
+vcenter_host_vmotion_vmk: "vmk0"
+vcenter_host_vmotion_vswitch: "vSwitch0"
+vcenter_host_vmotion_portgroup: "Management Network"
+vcenter_host_exit_maintenance: true

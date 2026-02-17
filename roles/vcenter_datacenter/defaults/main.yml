@@ -1,0 +1,14 @@
+---
+# defaults file for vcenter_datacenter
+
+vcenter_datacenter_name: "nested-devqedatacenter-1"
+vcenter_cluster_name: "nested-devqecluster-1"
+
+vcenter_drs_enabled: true
+vcenter_drs_behavior: "fullyAutomated"  # fullyAutomated, partiallyAutomated, manual
+
+vcenter_ha_enabled: true
+vcenter_ha_admission_control: false
+vcenter_ha_advanced_settings:
+  das.ignoreInsufficientHbDatastore: "True"
+  das.ignoreRedundantNetWarning: "True"

@@ -1,0 +1,48 @@
+---
+# Wait for vCenter services to be ready
+
+- name: Wait for VMware Tools to be running
+  community.vmware.vmware_guest_info:
+    name: "{{ host_fact_hostname }}"
+    datacenter: "{{ parent_vcenter_datacenter }}"
+  register: guest_info
+  until: guest_info.instance.guest_tools_status == "guestToolsRunning"
+  retries: 60
+  delay: 30
+
+- name: "Get vCenter VM {{ host_fact_hostname }} IP address"
+  community.vmware.vmware_guest_info:
+    datacenter: "{{ parent_vcenter_datacenter }}"
+    name: "{{ host_fact_hostname }}"
+    schema: vsphere
+    properties:
+      - guest.ipAddress
+  register: nested_vm
+
+- name: Add vCenter to inventory with IP address
+  ansible.builtin.add_host:
+    name: '{{ host_fact_hostname }}'
+    groups: vc
+    NESTEDVMIP: "{{ nested_vm.instance.guest.ipAddress }}"
+
+- name: Display vCenter IP
+  ansible.builtin.debug:
+    msg: "vCenter IP: {{ nested_vm.instance.guest.ipAddress }}"
+
+- name: Wait for vCenter API to be available
+  community.vmware.vmware_about_info:
+    hostname: "{{ nested_vm.instance.guest.ipAddress }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+  retries: 30
+  delay: 60
+  register: result
+  until: result is succeeded
+
+- name: "Wait for vCenter {{ host_fact_hostname }} ({{ nested_vm.instance.guest.ipAddress }}) HTTPS to be ready"
+  ansible.builtin.wait_for:
+    host: "{{ nested_vm.instance.guest.ipAddress }}"
+    port: 443
+    sleep: 10
+    timeout: "{{ nested_vcenter_wait_timeout }}"

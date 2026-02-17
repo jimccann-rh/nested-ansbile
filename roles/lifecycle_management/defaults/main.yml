@@ -1,0 +1,10 @@
+---
+# defaults file for lifecycle_management
+
+lifecycle_management_create_cron: false
+lifecycle_management_remove_cron: false
+lifecycle_management_retention_days: 1
+lifecycle_management_source_file: "/root/nested.source"
+lifecycle_management_playbook_dir: "/root/ansible-remotenesteddevqe/"
+lifecycle_management_playbook_name: "main.yml"
+lifecycle_management_inventory: "hosts"

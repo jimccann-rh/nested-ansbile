@@ -1,0 +1,33 @@
+---
+# Check if ESXi VM exists
+
+- name: "DELETE virtual machine {{ host_fact_hostname }} for testing"
+  community.vmware.vmware_guest:
+    datacenter: "{{ parent_vcenter_datacenter }}"
+    folder: "{{ parent_vcenter_datacenter }}/vm/{{ parent_vcenter_folder }}"
+    name: "{{ host_fact_hostname }}"
+    state: absent
+    force: true
+  when: nested_esxi_testing_mode | bool
+
+- name: "Check if ESXi virtual machine {{ host_fact_hostname }} exists"
+  community.vmware.vmware_guest:
+    datacenter: "{{ parent_vcenter_datacenter }}"
+    folder: "{{ parent_vcenter_datacenter }}/vm/{{ parent_vcenter_folder }}"
+    name: "{{ host_fact_hostname }}"
+    state: present
+
+- name: "Get existing ESXi VM {{ host_fact_hostname }} IP address"
+  community.vmware.vmware_guest_info:
+    datacenter: "{{ parent_vcenter_datacenter }}"
+    name: "{{ host_fact_hostname }}"
+    schema: vsphere
+    properties:
+      - guest.ipAddress
+  register: nested_vm
+
+- name: Add existing ESXi host to inventory with IP
+  ansible.builtin.add_host:
+    name: '{{ host_fact_hostname }}'
+    groups: esxi
+    NESTEDVMIP: "{{ nested_vm.instance.guest.ipAddress }}"

@@ -1,0 +1,54 @@
+---
+# tasks file for vcenter_networking
+
+- name: Set ESXi hostname fact
+  ansible.builtin.set_fact:
+    esxi_host_ip: "{{ hostvars[loop_bms].NESTEDVMIP }}"
+
+- name: "Create dvSwitch {{ vcenter_networking_dvs_name }}"
+  community.vmware.vmware_dvswitch:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    datacenter: "{{ vcenter_datacenter_name }}"
+    switch: "{{ vcenter_networking_dvs_name }}"
+    version: "{{ vcenter_networking_dvs_version }}"
+    mtu: "{{ vcenter_networking_dvs_mtu }}"
+    uplink_quantity: "{{ vcenter_networking_dvs_uplinks }}"
+    state: present
+  run_once: true
+
+- name: Pause after creating dvSwitch
+  ansible.builtin.pause:
+    seconds: "{{ vcenter_networking_pause_after_dvs }}"
+  run_once: true
+
+- name: "Add ESXi host {{ esxi_host_ip }} to dvSwitch"
+  community.vmware.vmware_dvs_host:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    esxi_hostname: "{{ esxi_host_ip }}"
+    switch_name: "{{ vcenter_networking_dvs_name }}"
+    vmnics: "{{ vcenter_networking_dvs_uplink_nics }}"
+    state: present
+
+- name: Pause after adding host to dvSwitch
+  ansible.builtin.pause:
+    seconds: "{{ vcenter_networking_pause_after_host }}"
+
+- name: Create portgroup on dvSwitch
+  community.vmware.vmware_dvs_portgroup:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    portgroup_name: "{{ vcenter_networking_portgroup_name }}"
+    switch_name: "{{ vcenter_networking_dvs_name }}"
+    vlan_id: "{{ vcenter_networking_portgroup_vlan_id }}"
+    num_ports: "{{ vcenter_networking_portgroup_num_ports }}"
+    port_binding: "{{ vcenter_networking_portgroup_binding }}"
+    state: present
+  run_once: true

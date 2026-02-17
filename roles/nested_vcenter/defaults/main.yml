@@ -1,0 +1,14 @@
+---
+# defaults file for nested_vcenter
+
+nested_vcenter_version: "8"
+nested_vcenter_deployment_size: "tiny"      # tiny, small, medium, large, infrastructure
+nested_vcenter_network_mode: "dhcp"         # dhcp or static
+nested_vcenter_disk_provisioning: "thin"
+nested_vcenter_ssh_enabled: true
+nested_vcenter_shell_enabled: true
+nested_vcenter_auto_config: true
+nested_vcenter_testing_mode: false          # Delete existing VMs if true
+nested_vcenter_wait_timeout: 1800
+nested_vcenter_initial_pause: 300           # Pause for reboot after deployment
+nested_vcenter_datastore: "vsanDatastore"

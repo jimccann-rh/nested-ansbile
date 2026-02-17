@@ -1,0 +1,12 @@
+---
+# tasks file for prerequisites
+
+- name: Install the needed system packages
+  ansible.builtin.package:
+    name: "{{ prerequisites_system_packages }}"
+    state: latest
+  become: true
+
+- name: Install needed python packages
+  ansible.builtin.pip:
+    name: "{{ prerequisites_python_packages }}"

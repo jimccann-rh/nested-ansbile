@@ -1,0 +1,37 @@
+---
+# Playbook to deploy only nested vCenter
+
+- name: Prepare dynamic inventory
+  hosts: remotedevqe
+  gather_facts: false
+  tasks:
+    - name: Add vCenter hosts to vc group
+      ansible.builtin.add_host:
+        name: '{{ item }}'
+        groups: vc
+      loop: "{{ nested_vcenter_hosts }}"
+      when: nested_vcenter_hosts is defined and nested_vcenter_hosts | length > 0
+
+  tags: always
+
+- name: Validate environment
+  hosts: remotedevqe
+  gather_facts: true
+  roles:
+    - role: resource_validation
+      tags: ['validate']
+
+- name: Deploy nested vCenter
+  hosts: remotedevqe
+  gather_facts: false
+  tasks:
+    - name: Deploy vCenter VMs
+      ansible.builtin.include_role:
+        name: nested_vcenter
+      loop: "{{ groups['vc'] }}"
+      loop_control:
+        loop_var: loop_bms_vc
+        index_var: my_idx_vc
+      when: groups['vc'] is defined and groups['vc'] | length > 0
+
+  tags: ['vcenter', 'deploy']

@@ -1,0 +1,54 @@
+---
+# tasks file for lifecycle_management
+
+- name: Calculate cleanup time
+  ansible.builtin.set_fact:
+    cron_time: "{{ lookup('pipe', 'date -d \"+{{ lifecycle_management_retention_days }} days\" +\"%M %H %d %m %Y\"') }}"
+    converth: "{{ nested_esxi_hosts | join(', ') }}"
+    convertv: "{{ nested_vcenter_hosts | join(', ') }}"
+  when: lifecycle_management_create_cron | bool
+
+- name: Build cron job command
+  ansible.builtin.set_fact:
+    cron_job: >-
+      source {{ lifecycle_management_source_file }} &&
+      cd {{ lifecycle_management_playbook_dir }} ;
+      ansible-playbook --connection=local -i {{ lifecycle_management_inventory }} {{ lifecycle_management_playbook_name }}
+      --extra-var cleanupcron=true
+      --extra-var version="{{ nested_environment_version }}"
+      --extra-var='{"target_hosts": [{{ converth }}]}'
+      --extra-var='{"target_vcs": [{{ convertv }}]}'
+      --extra-var removevsphere=true
+      -t removevsphere
+      >> /tmp/{{ nested_vcenter_hosts | join(',') }}.log 2>&1
+  when: lifecycle_management_create_cron | bool
+
+- name: Display cron job information
+  ansible.builtin.debug:
+    msg:
+      - "Cron execution time: {{ cron_time }}"
+      - "Minute: {{ cron_time.split()[0] }}"
+      - "Hour: {{ cron_time.split()[1] }}"
+      - "Day: {{ cron_time.split()[2] }}"
+      - "Month: {{ cron_time.split()[3] }}"
+      - "ESXi hosts: {{ converth }}"
+      - "vCenter hosts: {{ convertv }}"
+  when: lifecycle_management_create_cron | bool
+
+- name: Create cleanup cron job
+  ansible.builtin.cron:
+    state: present
+    name: "nested_cleanup {{ nested_vcenter_hosts | join(',') }}"
+    user: "{{ ansible_user }}"
+    minute: "{{ cron_time.split()[0] }}"
+    hour: "{{ cron_time.split()[1] }}"
+    day: "{{ cron_time.split()[2] }}"
+    month: "{{ cron_time.split()[3] }}"
+    job: "{{ cron_job }}"
+  when: lifecycle_management_create_cron | bool
+
+- name: Remove cleanup cron job
+  ansible.builtin.cron:
+    state: absent
+    name: "nested_cleanup {{ nested_vcenter_hosts[0] }}"
+  when: lifecycle_management_remove_cron | bool

@@ -1,0 +1,44 @@
+---
+# tasks file for vcenter_datacenter
+
+- name: Create Datacenter
+  community.vmware.vmware_datacenter:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    datacenter_name: '{{ vcenter_datacenter_name }}'
+    state: present
+
+- name: Create Cluster
+  community.vmware.vmware_cluster:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    datacenter_name: '{{ vcenter_datacenter_name }}'
+    cluster_name: '{{ vcenter_cluster_name }}'
+
+- name: Enable DRS
+  community.vmware.vmware_cluster_drs:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    datacenter: '{{ vcenter_datacenter_name }}'
+    cluster_name: '{{ vcenter_cluster_name }}'
+    enable: "{{ vcenter_drs_enabled }}"
+    drs_default_vm_behavior: "{{ vcenter_drs_behavior }}"
+  when: vcenter_drs_enabled | bool
+
+- name: Enable HA
+  community.vmware.vmware_cluster_ha:
+    hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+    username: 'administrator@{{ nested_domain }}'
+    password: "{{ nested_password }}"
+    validate_certs: false
+    datacenter: '{{ vcenter_datacenter_name }}'
+    cluster_name: '{{ vcenter_cluster_name }}'
+    enable: "{{ vcenter_ha_enabled }}"
+    advanced_settings: "{{ vcenter_ha_advanced_settings }}"
+  when: vcenter_ha_enabled | bool

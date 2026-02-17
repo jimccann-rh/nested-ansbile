@@ -1,0 +1,30 @@
+---
+# tasks file for nested_vcenter
+
+- name: Include version-specific variables
+  ansible.builtin.include_vars: "vcenter-{{ nested_vcenter_version }}.yml"
+
+- name: List hosts in vCenter group
+  ansible.builtin.debug:
+    msg: "vCenter Host: {{ item }}"
+  loop: "{{ groups['vc'] }}"
+
+- name: Set vCenter hostname fact
+  ansible.builtin.set_fact:
+    host_fact_hostname: "{{ loop_bms_vc }}"
+
+- name: Set guest ID based on version
+  ansible.builtin.set_fact:
+    vmkguest: "{{ nested_vcenter_guest_id }}"
+
+- name: Check for existing vCenter VM and deploy if needed
+  block:
+    - name: Check if vCenter VM exists
+      ansible.builtin.include_tasks: check_existing.yml
+
+  rescue:
+    - name: Deploy new vCenter VM
+      ansible.builtin.include_tasks: deploy_new.yml
+
+    - name: Wait for vCenter services
+      ansible.builtin.include_tasks: wait_for_services.yml
