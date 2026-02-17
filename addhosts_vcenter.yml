@@ -171,6 +171,7 @@
         vmfs_version: 6
         datastore_type: vmfs
         state: present
+      when: vmfs_dn is defined
 
 #    - name: Set Allowed vCLS Datastores
 #      vmware.vmware.cluster_vcls:
