@@ -1,6 +1,9 @@
 ---
 # defaults file for vcenter_storage
 
+vcenter_datacenter_name: "nested-devqedatacenter-1"
+vcenter_cluster_name: "nested-devqecluster-1"
+
 # VMFS datastore configuration
 vcenter_storage_vmfs_version: 6
 

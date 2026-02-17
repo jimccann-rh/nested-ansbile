@@ -1,6 +1,8 @@
 ---
 # defaults file for vcenter_networking
 
+vcenter_datacenter_name: "nested-devqedatacenter-1"
+vcenter_cluster_name: "nested-devqecluster-1"
 vcenter_networking_dvs_enabled: true
 vcenter_networking_dvs_name: "dvSwitch-nested"
 vcenter_networking_dvs_version: "8.0.0"

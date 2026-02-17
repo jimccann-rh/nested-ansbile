@@ -1,6 +1,8 @@
 ---
 # defaults file for vcenter_host_config
 
+vcenter_datacenter_name: "nested-devqedatacenter-1"
+vcenter_cluster_name: "nested-devqecluster-1"
 vcenter_host_power_policy: "high-performance"
 vcenter_host_autostart_enabled: true
 vcenter_host_autostart_delay: 100
