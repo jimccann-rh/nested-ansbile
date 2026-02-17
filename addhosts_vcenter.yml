@@ -78,12 +78,15 @@
 - block:
 
     - name: "Add ESXi Host {{ hostvars[groups['esxi'][my_idx]].NESTEDVMIP }} to vCenter {{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
-      community.vmware.vmware_host:
+      vmware.vmware.esxi_host:
+        hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+        username: 'administrator@{{ vc_fact_domain }}'
+        password: "{{ vc_fact_password }}"
+        validate_certs: false
         datacenter: "{{ vc_fact_datacenter1 }}"
         cluster: "{{ vc_fact_cluster1 }}"
-        #esxi_hostname: "{{ hostvars[inventory_hostname].ansible_host_ip }}"
+        esxi_host_name: "{{ hostvars[groups['esxi'][my_idx]].NESTEDVMIP }}"
         esxi_username: "root"
-        #esxi_password: "{{ lookup('ansible.builtin.env', 'VCESXIPASSWORD') }}"
         esxi_password: "{{ vc_fact_password }}"
         state: present
 #      when: '"1" in hostvars[groups["esxi"][my_idx]].DC | string'
@@ -209,9 +212,14 @@
            type: 'dhcp'
  
     - name: Exit Maintenance Mode
-      community.vmware.vmware_maintenancemode:
+      vmware.vmware.esxi_maintenance_mode:
+        hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
+        username: 'administrator@{{ vc_fact_domain }}'
+        password: "{{ vc_fact_password }}"
+        validate_certs: false
+        esxi_host_name: "{{ hostvars[groups['esxi'][my_idx]].NESTEDVMIP }}"
         timeout: 3600
-        state: absent
+        enable_maintenance_mode: false
 
   ignore_errors: true
   #delegate_to: localhost

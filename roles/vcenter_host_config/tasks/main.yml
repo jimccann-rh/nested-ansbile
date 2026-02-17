@@ -6,14 +6,14 @@
     esxi_host_ip: "{{ hostvars[loop_bms].NESTEDVMIP }}"
 
 - name: "Add ESXi Host {{ esxi_host_ip }} to vCenter"
-  community.vmware.vmware_host:
+  vmware.vmware.esxi_host:
     hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
     username: 'administrator@{{ nested_domain }}'
     password: "{{ nested_password }}"
     validate_certs: false
     datacenter: "{{ vcenter_datacenter_name }}"
     cluster: "{{ vcenter_cluster_name }}"
-    esxi_hostname: "{{ esxi_host_ip }}"
+    esxi_host_name: "{{ esxi_host_ip }}"
     esxi_username: "root"
     esxi_password: "{{ nested_password }}"
     state: present
@@ -56,12 +56,12 @@
       type: 'dhcp'
 
 - name: Exit maintenance mode
-  community.vmware.vmware_maintenancemode:
+  vmware.vmware.esxi_maintenance_mode:
     hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
     username: 'administrator@{{ nested_domain }}'
     password: "{{ nested_password }}"
     validate_certs: false
-    esxi_hostname: "{{ esxi_host_ip }}"
+    esxi_host_name: "{{ esxi_host_ip }}"
     timeout: 3600
-    state: absent
+    enable_maintenance_mode: false
   when: vcenter_host_exit_maintenance | bool
