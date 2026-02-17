@@ -8,7 +8,8 @@ vcenter_cluster_name: "nested-devqecluster-1"
 vcenter_storage_vmfs_version: 6
 
 # Device CTD (Controller:Target:LUN) for the disk to use as VMFS datastore
-# Typically the second disk on nested ESXi appears as vmhba0:C0:T2:L0
+# ESXi 8: Typically appears as vmhba0:C0:T2:L0
+# ESXi 9: Typically appears as vmhba1:C0:T2:L0 (auto-detected)
 # Format: vmhba<controller>:C<channel>:T<target>:L<lun>
 # Override this if your disk appears on a different CTD
 vcenter_storage_vmfs_device_ctd: "vmhba0:C0:T2:L0"

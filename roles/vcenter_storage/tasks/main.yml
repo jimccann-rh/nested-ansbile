@@ -5,6 +5,14 @@
   ansible.builtin.set_fact:
     esxi_host_ip: "{{ hostvars[loop_bms].NESTEDVMIP }}"
 
+- name: Set version-specific VMFS device CTD for ESXi 9
+  ansible.builtin.set_fact:
+    vcenter_storage_vmfs_device_ctd: "vmhba1:C0:T2:L0"
+  when:
+    - nested_environment_version is defined
+    - nested_environment_version == "9"
+    - vcenter_storage_vmfs_device_ctd == "vmhba0:C0:T2:L0"
+
 - name: Rescan HBA for storage devices
   community.vmware.vmware_host_scanhba:
     hostname: "{{ hostvars[groups['vc'][0]].NESTEDVMIP }}"
