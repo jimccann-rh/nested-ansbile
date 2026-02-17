@@ -70,6 +70,7 @@ hosts.bak
 # Cache
 .cache/
 *.cache
+/tmp/ansible_facts
 
 # Sensitive data
 *password*
