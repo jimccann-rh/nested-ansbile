@@ -1,8 +1,15 @@
 ---
 # defaults file for vcenter_storage
 
+# VMFS datastore configuration
 vcenter_storage_vmfs_version: 6
-vcenter_storage_vmfs_device_ctd: "vmhba1:C0:T2:L0"
+
+# Device CTD (Controller:Target:LUN) for the disk to use as VMFS datastore
+# Typically the second disk on nested ESXi appears as vmhba0:C0:T2:L0
+# Format: vmhba<controller>:C<channel>:T<target>:L<lun>
+# Override this if your disk appears on a different CTD
+vcenter_storage_vmfs_device_ctd: "vmhba0:C0:T2:L0"
+
 vcenter_storage_vmfs_datastore_prefix: "Datastore"
 vcenter_storage_nfs_enabled: false
 vcenter_storage_rescan_hba: true

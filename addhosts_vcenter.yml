@@ -159,8 +159,7 @@
       set_fact:
         vmfs_dn: "{{ item.canonical_name }}"
       loop: "{{ vmhbainfo }}"
-      when: item.device_ctd_list[0] == "vmhba1:C0:T2:L0"
-      #when: item.device_ctd_list[0] == "vmhba0:C0:T2:L0"
+      when: item.device_ctd_list[0] == "vmhba0:C0:T2:L0"
 
 #    - debug:
 #        msg:
