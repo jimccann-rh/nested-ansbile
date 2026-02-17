@@ -78,16 +78,20 @@ nested_vcenter_hosts: []
 # ==============================================================================
 # Ansible Collections
 # ==============================================================================
-
-ansible_collections:
-  - vmware.vmware       # Required for cluster/datacenter modules (v6.0.0+)
-  - community.vmware    # Required for guest/host operations
-  - community.general
+# Collections are defined in requirements.yml
+# Install with: ansible-galaxy collection install -r requirements.yml
+#
+# Required collections:
+#   - vmware.vmware (v1.11.0+)      - Cluster modules
+#   - community.vmware (v5.0.0+)    - Guest/host operations, datacenter
+#   - community.general (v5.0.0+)   - General utilities
 
 # ==============================================================================
 # Module Defaults for Parent vCenter Operations
 # ==============================================================================
-# These defaults apply to all VMware modules when connecting to parent vCenter
+# These defaults apply to community.vmware modules when connecting to parent vCenter
+# NOTE: vmware.vmware modules do NOT support module_defaults and require explicit
+# connection parameters (hostname, username, password, validate_certs)
 
 module_defaults:
   group/vmware:
