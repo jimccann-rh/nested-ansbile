@@ -1,6 +1,11 @@
 ---
 # tasks file for nested_esxi
 
+- name: Set ESXi version from environment version if provided
+  ansible.builtin.set_fact:
+    nested_esxi_version: "{{ nested_environment_version }}"
+  when: nested_environment_version is defined
+
 - name: Include version-specific variables
   ansible.builtin.include_vars: "esxi-{{ nested_esxi_version }}.yml"
 

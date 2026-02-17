@@ -1,6 +1,11 @@
 ---
 # tasks file for nested_vcenter
 
+- name: Set vCenter version from environment version if provided
+  ansible.builtin.set_fact:
+    nested_vcenter_version: "{{ nested_environment_version }}"
+  when: nested_environment_version is defined
+
 - name: Include version-specific variables
   ansible.builtin.include_vars: "vcenter-{{ nested_vcenter_version }}.yml"
 
