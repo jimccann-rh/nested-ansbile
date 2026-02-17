@@ -4,6 +4,12 @@
 - name: Prepare dynamic inventory
   hosts: remotedevqe
   gather_facts: false
+  module_defaults:
+    group/vmware:
+      hostname: "{{ parent_vcenter_hostname }}"
+      username: "{{ parent_vcenter_username }}"
+      password: "{{ parent_vcenter_password }}"
+      validate_certs: "{{ parent_vcenter_validate_certs }}"
   tasks:
     - name: Add ESXi hosts to esxi group
       ansible.builtin.add_host:
@@ -24,6 +30,12 @@
 - name: Validate and prepare environment
   hosts: remotedevqe
   gather_facts: true
+  module_defaults:
+    group/vmware:
+      hostname: "{{ parent_vcenter_hostname }}"
+      username: "{{ parent_vcenter_username }}"
+      password: "{{ parent_vcenter_password }}"
+      validate_certs: "{{ parent_vcenter_validate_certs }}"
   roles:
     - role: prerequisites
       tags: ['prerequisites', 'never']
@@ -36,6 +48,12 @@
 - name: Deploy nested ESXi hosts
   hosts: remotedevqe
   gather_facts: false
+  module_defaults:
+    group/vmware:
+      hostname: "{{ parent_vcenter_hostname }}"
+      username: "{{ parent_vcenter_username }}"
+      password: "{{ parent_vcenter_password }}"
+      validate_certs: "{{ parent_vcenter_validate_certs }}"
   tasks:
     - name: Deploy ESXi VMs
       ansible.builtin.include_role:
@@ -51,6 +69,12 @@
 - name: Deploy nested vCenter
   hosts: remotedevqe
   gather_facts: false
+  module_defaults:
+    group/vmware:
+      hostname: "{{ parent_vcenter_hostname }}"
+      username: "{{ parent_vcenter_username }}"
+      password: "{{ parent_vcenter_password }}"
+      validate_certs: "{{ parent_vcenter_validate_certs }}"
   tasks:
     - name: Deploy vCenter VMs
       ansible.builtin.include_role:
@@ -67,6 +91,12 @@
   hosts: remotedevqe
   gather_facts: false
   serial: 1
+  module_defaults:
+    group/vmware:
+      hostname: "{{ parent_vcenter_hostname }}"
+      username: "{{ parent_vcenter_username }}"
+      password: "{{ parent_vcenter_password }}"
+      validate_certs: "{{ parent_vcenter_validate_certs }}"
   tasks:
     - name: Create datacenter and cluster
       ansible.builtin.include_role:
@@ -108,6 +138,12 @@
 - name: Display environment information
   hosts: remotedevqe
   gather_facts: false
+  module_defaults:
+    group/vmware:
+      hostname: "{{ parent_vcenter_hostname }}"
+      username: "{{ parent_vcenter_username }}"
+      password: "{{ parent_vcenter_password }}"
+      validate_certs: "{{ parent_vcenter_validate_certs }}"
   tasks:
     - name: Show vCenter access information
       ansible.builtin.debug:
